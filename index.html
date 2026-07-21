@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body style="font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 50px;">
+
+    <!-- Trigger Button -->
+    <button id="generate-btn" style="padding: 12px 24px; font-size: 16px; margin-bottom: 30px; cursor: pointer; background-color: #3498db; color: white; border: none; border-radius: 5px;">
+        Generate Cert (Random)
+    </button>
+
+    <!-- Certificate Visual Template -->
+    <div id="certificate-container" style="position: relative; width: 600px; height: 400px; background-color: #f8f9fa; border: 8px solid #2c3e50; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        
+        <h2 style="text-align: center; margin-top: 60px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 2px;">Certificate of Completion</h2>
+        
+        <!-- Injectable Data Fields -->
+        <h1 id="cert-name" style="text-align: center; margin-top: 50px; color: #2c3e50; font-size: 42px; margin-bottom: 10px;">[Student Name]</h1>
+        <p style="text-align: center; font-size: 18px; color: #7f8c8d; margin: 0;">has successfully completed</p>
+        <h3 id="cert-course" style="text-align: center; color: #e74c3c; font-size: 28px; margin-top: 15px;">[Course Name]</h3>
+        
+        <p id="cert-date" style="position: absolute; bottom: 30px; right: 40px; font-weight: bold; color: #2c3e50;">Date: [Date]</p>
+    </div>
+
+    <script>
+        document.getElementById('generate-btn').addEventListener('click', async () => {
+            try {
+                // 1. Hit the Flask API
+                const response = await fetch('http://localhost:5000/api/certificates');
+                if (!response.ok) throw new Error("Network response was not ok");
+                
+                const csvText = await response.text();
+
+                // 2. Parse the CSV text
+                Papa.parse(csvText, {
+                    header: true,
+                    complete: function(results) {
+                        const student = results.data[0]; 
+                        
+                        // 3. Update the DOM elements
+                        document.getElementById('cert-name').innerText = student.name;
+                        document.getElementById('cert-course').innerText = student.course;
+                        document.getElementById('cert-date').innerText = "Date: " + student.date;
+                    }
+                });
+            } catch (error) {
+                console.error("Fetch error:", error);
+                alert("Could not connect to the API. Make sure app.py is running!");
+            }
+        });
+    </script>
+</body>
+</html>
