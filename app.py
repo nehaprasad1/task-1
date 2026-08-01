@@ -9,6 +9,7 @@ CORS(app)
 names = ["Neha Prasad", "Bob The-Builder", "ABC Xyx", "ASS Pass", "Jhone sinha"]
 crs = ["Intro to Python", "Advanced Python", "Web Development", "Data Science"]
 
+
 @app.route('/api/certificates', methods=['GET'])
 def get_certificates():
     student = {
